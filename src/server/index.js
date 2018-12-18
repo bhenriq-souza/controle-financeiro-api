@@ -1,4 +1,17 @@
+const { MongoConnection } = require('../database');
+
 class Server {
+
+  /**
+   * Initialize the Server Class
+   * 
+   * @constructor
+   * 
+   * @param {*} fastify 
+   * @param {*} mongoose 
+   * @param {*} fastCors 
+   * @param {*} fastifySwagger 
+   */ 
   constructor(fastify, mongoose,  fastCors, fastifySwagger) {
     this.fastify = fastify;
     this.mongoose = mongoose;
@@ -9,9 +22,9 @@ class Server {
   /**
    * Creates the server
    * 
-   * @param {object} config 
+   * @param {Object} config 
    */
-  create(config) {
+  async create(config) {
     const { fastCorsOpt, swaggerOpt, env, serverPort } = config;
 
     /*** Setting the server port */
@@ -26,15 +39,10 @@ class Server {
     /*** Setting the env */
     this.fastify.use('env', env);
 
-    /*** Connecting to Mongo */
-    const { mongo: { hostname, database, port } } = config;    
-    const connectionString = `${hostname}:${port}/${database}`;
-
-    this.mongoose.connect(connectionString, { useNewUrlParser: true })
-      .then(() => console.log(`Connected to database ${database}`))
-      .catch(err => console.log(err));
+    /*** Connecting to Mongo */    
+    const mongooseConn = new MongoConnection(this.mongoose, config);
+    mongooseConn.connect();
   }
-
 
   /**
    * Starts the server
@@ -43,7 +51,7 @@ class Server {
     try {
       await this.fastify.listen(this.port);
       this.fastify.swagger();
-      this.fastify.log.info(`server listening on ${this.fastify.server.address().port}`)
+      this.fastify.log.info(`server listening on ${this.fastify.server.address().port}`);
     } catch (err) {
       this.fastify.log.error(err);
       process.exit(1);
