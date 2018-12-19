@@ -1,5 +1,5 @@
 const { MongoConnection } = require('../database');
-const { registerRoute } = require('../utils');
+const { ServerUtil } = require('../utils');
 const { routes } = require('../routes');
 
 class Server {
@@ -39,7 +39,7 @@ class Server {
     this.fastify.register(this.fastifySwagger, swaggerOpt.options);
 
     /*** Registering routes */
-    routes.forEach( route => registerRoute(route, this.fastify) );
+    routes.forEach( route => ServerUtil.registerRoute(route, this.fastify) );
 
     /*** Setting the env */
     this.fastify.use('env', env);

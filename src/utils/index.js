@@ -1,5 +1,2 @@
-
-/**
- * Registers routes dinamically
- */
-exports.registerRoute = (route, server) => server.route(route);
+exports.ServerUtil = require('./server');
+exports.HttpUtil = require('./http');
