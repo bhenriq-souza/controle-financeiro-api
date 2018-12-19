@@ -1,4 +1,6 @@
 const { MongoConnection } = require('../database');
+const { registerRoute } = require('../utils');
+const { routes } = require('../routes');
 
 class Server {
 
@@ -36,8 +38,14 @@ class Server {
     /*** Registering swagger */
     this.fastify.register(this.fastifySwagger, swaggerOpt.options);
 
+    /*** Registering routes */
+    routes.forEach( route => registerRoute(route, this.fastify) );
+
     /*** Setting the env */
     this.fastify.use('env', env);
+
+    /*** Setting mongoose's index creation as true */
+    this.mongoose.set('useCreateIndex', true);
 
     /*** Connecting to Mongo */    
     const mongooseConn = new MongoConnection(this.mongoose, config);
