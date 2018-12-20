@@ -1,6 +1,5 @@
 const boom = require('boom');
 
-const { User } = require('../models');
 const { UserServices } = require('../services');
 const { HttpUtil } = require('../utils');
 
