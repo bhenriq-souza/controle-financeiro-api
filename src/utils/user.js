@@ -56,6 +56,21 @@ function _verifyPasswordPattern(password) {
   return result;
 }
 
+/**
+ * Build validation object
+ * 
+ * @param {Boolean} valid 
+ * @param {Array} messages 
+ * 
+ * @returns {Object} Validation object
+ */
+function _makeValidationObject(valid, messages) {
+  return  {
+    valid: valid,
+    msg: messages
+  };
+}
+
 class UserUtil { 
 
   constructor() { }
@@ -71,9 +86,9 @@ class UserUtil {
   static pwdValidation(password, passwordConfirmation) {    
     const pwdConfirmation = _verifyPasswordConfirmation(password, passwordConfirmation);
     const pwdPattern = _verifyPasswordPattern(password);
-    if(!pwdConfirmation)  return { valid: false, msg: ['Password and confirmation must match'] };
-    if(!pwdPattern.valid) return { valid: false, msg: pwdPattern.msg };
-    return { valid: true, msg: '' };
+    if(!pwdConfirmation)  return _makeValidationObject(false, ['Password and confirmation must match']);
+    if(!pwdPattern.valid) return _makeValidationObject(false, pwdPattern.msg);
+    return _makeValidationObject(true, []);
   }
 
   /**
