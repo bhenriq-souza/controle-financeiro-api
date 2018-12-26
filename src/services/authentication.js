@@ -30,7 +30,7 @@ class AuthenticationService {
     if(!user) return HttpUtil.makeJsonResult(404, { msg: ['User not found'] });
     if(!_comparePassword(password, user.password)) HttpUtil.makeJsonResult(401, { msg: ['Password not matches'] });
     const token = AuthUtil.generateToken(user);
-    return HttpUtil.makeJsonResult(200, { success: true, token: token });
+    return HttpUtil.makeJsonResult(200, { success: true, token: token, user: user._id });
   }
 }
 
