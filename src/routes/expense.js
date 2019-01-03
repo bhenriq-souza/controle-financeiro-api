@@ -20,6 +20,16 @@ const routes = [
     method: 'POST',
     url: '/api/expenses',
     handler: ExpenseController.addExpense
+  },
+  {
+    method: 'PUT',
+    url: '/api/expenses',
+    handler: ExpenseController.updateExpense
+  },
+  {
+    method: 'DELETE',
+    url: '/api/expenses',
+    handler: ExpenseController.deleteExpense
   }
 ];
 

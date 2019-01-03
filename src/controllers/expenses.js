@@ -72,6 +72,38 @@ class ExpensesController {
       throw boom.boomify(error);
     }
   }
+
+  /**
+   * PUT - /expenses
+   * 
+   * @param {*} request 
+   * @param {*} reply 
+   */
+  static async updateExpense(request, reply) {
+    try {
+      const { id, data } = request.body;
+      const result = await ExpenseServices.updateExpense(id, data);
+      HttpUtil.makeHttpResponse(reply, result.status, result.result);
+    } catch (error) {
+      throw boom.boomify(error);
+    }
+  }
+
+  /**
+   * DELETE - /expenses
+   * 
+   * @param {*} request 
+   * @param {*} reply 
+   */
+  static async deleteExpense(request, reply) {
+    try {
+      const { id } = request.body;
+      const result = await ExpenseServices.deleteExpense(id);
+      HttpUtil.makeHttpResponse(reply, result.status, result.result);
+    } catch (error) {
+      throw boom.boomify(error);
+    }
+  }
 }
 
 module.exports = ExpensesController;
