@@ -1,3 +1,4 @@
 exports.AuthServices = require('./authentication');
-exports.UserServices = require('./user');
+exports.BankServices = require('./bank');
 exports.ExpenseServices = require('./expense');
+exports.UserServices = require('./user');
