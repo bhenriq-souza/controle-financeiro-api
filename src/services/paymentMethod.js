@@ -3,7 +3,7 @@
 const { format } = require('date-fns');
 
 const { PaymentMethod } = require('../models');
-const { HttpUtil } = require('../utils');
+const { HttpUtil, PaymentMethodUtil } = require('../utils');
 
 class PaymentMethodService {
 
@@ -27,10 +27,18 @@ class PaymentMethodService {
    * @returns {Object} Result object
    */
   static async addPaymentMethod(payMethodData) {
-    const createdAt = format(new Date());  
+
+    /*** credit card validations */
+    if(payMethodData && payMethodData.isCreditCard) {
+      const result = PaymentMethodUtil.isPaymentMethodValid(payMethodData);
+      if(!result.valid) return HttpUtil.makeJsonResult(409, { msg: result.msg });
+    }
+      
     /*** update create date */
+    const createdAt = format(new Date());
     payMethodData.createdAt = createdAt;
-    const payMethod = new PaymentMethod(payMethodData);
+
+    const payMethod = new PaymentMethod(payMethodData);    
     const newPayMethod = await payMethod.save();
     return HttpUtil.makeJsonResult(200, { success: true, newPayMethod: newPayMethod });
   }
