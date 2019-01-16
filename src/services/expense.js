@@ -1,6 +1,5 @@
 
 
-const bcrypt = require('bcrypt');
 const { format } = require('date-fns');
 
 const { Expense } = require('../models');
@@ -31,7 +30,7 @@ class ExpenseService {
    * @returns {Array} Array of expenses
    */
   static async getFixedExpensesByUser(userId, dueDay) {
-    const expenses = await Expense.find({ user: userId, fixedData: true, fixedDueDay: dueDay });
+    const expenses = await Expense.find({ user: userId, fixedDate: true, fixedDueDay: dueDay });
     return HttpUtil.makeJsonResult(200, { success: true, expenses: expenses });
   }
 
@@ -62,7 +61,7 @@ class ExpenseService {
       expenseData.value, 
       expenseData.user
     );
-    /*** is expense duplicate */ 
+
     // If the expense is duplicated, return an error and forces the user to update the data
     if(duplicatedExpense) {
       return HttpUtil.makeJsonResult(409, { 
@@ -70,23 +69,42 @@ class ExpenseService {
         expense: duplicatedExpense 
       });
     }
+
     /*** is due date valid */
     if(!ExpenseUtil.checkDueDate(expenseData.dueDate)) {
-      return HttpUtil.makeJsonResult(409, { success: false, msg: ['Due date must be greather then creation day'] });
+      return HttpUtil.makeJsonResult(409, { 
+        success: false, 
+        msg: ['Due date must be greather then creation day'] 
+      });
     }
+
     /*** is issue value valid */
     if(!ExpenseUtil.checkIssueValue(expenseData.value)) {
-      return HttpUtil.makeJsonResult(409, { success: false, msg: ['Invalid value'] });
+      return HttpUtil.makeJsonResult(409, { 
+        success: false, 
+        msg: ['Invalid value'] 
+      });
     }
-    /*** is fixed data */
-    if(expenseData.fixedData) {
-      expenseData.dueDate = null;
-    }
+
+    /*** no pendent data */
+    expenseData.pendentData = false;
+
     /*** update create date */
-    expenseData.createdAt = createdAt;
-    const expense = new Expense(expenseData);
-    const newExpense = await expense.save();
-    return HttpUtil.makeJsonResult(200, { success: true, expense: newExpense });
+    expenseData.createdAt = createdAt;   
+
+    let result = null;
+
+    /*** if it's fixed date, create new expenses for a fixed number of dates */
+    if(expenseData.fixedDate) {
+      result = await ExpenseUtil.addInstallments(expenseData);
+    } else {
+      /*** instantiate new expense */
+      const expense = new Expense(expenseData);
+      /*** save expense */
+      result = await expense.save();
+    }
+
+    return HttpUtil.makeJsonResult(200, { success: true, expense: result });
   }
 
   /**
